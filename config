@@ -1,0 +1,5 @@
+provider dima output/user1.cvs
+product apple output/user2.cvs
+provider vitaliy output/user3.cvs
+product pen output/user4.cvs
+product penapple output/user5.cvs
