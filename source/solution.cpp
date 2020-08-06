@@ -3,21 +3,28 @@
 #include <dirent.h>
 #include <cstring>
 #include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <set>
 
 Solution::Solution(const std::string& input, const std::string& output, const std::string& conf) {
-    addDirrectory(input);
     addConfig(conf);
-    print();
+    updateDirrectory(input);
 }
 
-bool Solution::addDirrectory(const std::string& path) {
+bool Solution::updateDirrectory(const std::string& path) {
     DIR* dir = opendir(path.c_str());
     dirent* file;
+    struct stat stat_file;
+    
+    bool is_updated;
+    std::set<std::string> list_of_files;
 
     if (dir == nullptr) {
         return false;
     }
 
+    // check all files in dirrectory
     while (true) {
         file = readdir(dir);
         if (file == nullptr) {
@@ -25,25 +32,47 @@ bool Solution::addDirrectory(const std::string& path) {
         }
 
         std::string name(file->d_name);
+        std::string new_path = path + "/" + name;
 
         if (file->d_type != DT_REG) {
             continue;
         }
 
-        if (path.back() == '/') {
-            addFile(path + name);
-        } else {
-            addFile(path + "/" + name);
+        list_of_files.insert(new_path);
+
+        stat(new_path.c_str(), &stat_file);
+
+        if (files.find(new_path) == files.end() || files[new_path].getVersion() != stat_file.st_mtime) {
+            printf("update: %s\n", new_path.c_str());
+            addFile(new_path);
+            files[new_path].setVersion(stat_file.st_mtime);
+            is_updated = true;
         }
+    }
+
+    // check removed files
+    for (auto it = files.begin(); it != files.end();) {
+        if (list_of_files.find(it->first) == list_of_files.end()) {
+            printf("delete: %s\n", it->first.c_str());
+            it = files.erase(it);
+            is_updated = true;
+        } else {
+            ++it;
+        }
+    }
+
+    // if something was changed
+    if (is_updated) {
+        print();
     }
     return true;
 }
-// [name, cost, provider, count]
+
 bool Solution::addFile(const std::string& path) {
     DataBase new_database;
-
     std::string line;
     std::ifstream in(path);
+    
     if (!in.is_open()) {
         return false;
     }

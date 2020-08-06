@@ -7,9 +7,9 @@
 class Solution {
 public:
     Solution(const std::string& input, const std::string& output, const std::string& conf);
+    bool updateDirrectory(const std::string& path);
 
 private:
-    bool addDirrectory(const std::string& path);
     bool addFile(const std::string& path);
     bool addConfig(const std::string& path);
 

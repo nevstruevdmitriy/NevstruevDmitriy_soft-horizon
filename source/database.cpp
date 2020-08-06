@@ -14,6 +14,14 @@ void DataBase::print(const Config& config) const {
     printf("Unnown column %s\n", config.column.c_str());
 }
 
+int DataBase::getVersion() const {
+    return version;
+}
+
+void DataBase::setVersion(int version_) {
+    version = version_;
+}
+
 void DataBase::addProduct(std::string& name, std::string& product) {
     products[name].push_back(product);
 }
@@ -23,7 +31,6 @@ void DataBase::addProvider(std::string& name, std::string& provider) {
 }
 
 void DataBase::printProduct(const std::string& path, const std::string& name) const {
-    //printf("%s\n", products.size());
     if (products.find(name) != products.end()) {
         printData(path, products.at(name));
     }
@@ -40,8 +47,12 @@ void DataBase::printData(const std::string& path, const std::vector<std::string>
 
     out.open(path.c_str(), std::ios_base::app);
 
+    if (!out.is_open()) {
+        printf("error open %s, can not find dirrectory\n", path.c_str());
+        return;
+    }
+
     for (size_t i = 0; i < data.size(); ++i) {
-        printf("%s\n", path.c_str());
         out << data[i] << std::endl;
     }
 

@@ -13,12 +13,15 @@ public:
     DataBase() = default;
     DataBase(const DataBase&) = default;
     DataBase(DataBase&&) = default;
-    
-    DataBase& operator=(DataBase&) = default;
+    DataBase& operator=(const DataBase&) = default;
+
     void print(const Config& confg) const;
 
     void addProvider(std::string& name, std::string& provider);
     void addProduct(std::string& name, std::string& product);
+
+    int getVersion() const;
+    void setVersion(int verstion_);
 
 private:
     void printProduct(const std::string& path, const std::string& name) const;
@@ -27,4 +30,6 @@ private:
 
     std::map<std::string, std::vector<std::string> > providers;
     std::map<std::string, std::vector<std::string> > products;
+
+    int version;
 };
